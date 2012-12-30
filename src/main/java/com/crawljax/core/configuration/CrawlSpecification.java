@@ -96,18 +96,20 @@ public class CrawlSpecification {
 	}
 
 	/**
-	 * Guifre Ruiz: This method can be used to crawl more tags and, therefore, more pages in the
-	 * target. However, it slow down a bit the process.
+	 * Let the crawler click a much more elements. This enables:
+	 * <ul>
+	 * <li>{@link #clickDefaultElements()}
+	 * <li>{@link #clickTableElements()}
+	 * <li>span, div, ol, center, li, radio, non, meta, refresh, xhr, relative, link, self, form,
+	 * input, option, img and p}.
+	 * </ul>
 	 */
 	public void clickMoreElements() {
-		crawlActions.click("a");
-		crawlActions.click("button");
-		crawlActions.click("td");
+		clickDefaultElements();
+		clickTableElements();
+
 		crawlActions.click("span");
 		crawlActions.click("div");
-		crawlActions.click("tr");
-		crawlActions.click("table");
-		crawlActions.click("tbody");
 		crawlActions.click("ol");
 		crawlActions.click("center");
 		crawlActions.click("li");
@@ -124,6 +126,16 @@ public class CrawlSpecification {
 		crawlActions.click("option");
 		crawlActions.click("img");
 		crawlActions.click("p");
+	}
+
+	/**
+	 * Let the crawler click {@code <table>, <td>, <tr> and <tbody>} elements.
+	 */
+	public void clickTableElements() {
+		crawlActions.click("td");
+		crawlActions.click("table");
+		crawlActions.click("tr");
+		crawlActions.click("tbody");
 	}
 
 	/**

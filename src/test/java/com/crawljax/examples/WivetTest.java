@@ -8,29 +8,31 @@
  */
 package com.crawljax.examples;
 
-import org.apache.commons.configuration.ConfigurationException;
+import org.junit.Test;
 
 import com.crawljax.browser.EmbeddedBrowser;
 import com.crawljax.core.CrawljaxController;
-import com.crawljax.core.CrawljaxException;
 import com.crawljax.core.configuration.CrawlSpecification;
 import com.crawljax.core.configuration.CrawljaxConfiguration;
 import com.crawljax.core.configuration.ThreadConfiguration;
 
 /**
  * Test specification for crawling the wivet benchmark project.
- * 
- * @author Guifre Ruiz <guifre.ruiz@gmail.com>
- * @version 0.1
  */
 public class WivetTest {
+
+	@Test
+	public void runCrawlerOnWivet3() throws Exception {
+		CrawljaxController crawljax = new CrawljaxController(getConfig());
+		crawljax.run();
+	}
 
 	/**
 	 * @return the crawljax specification
 	 */
-	private static CrawlSpecification getCrawlSpec() {
+	private CrawlSpecification getCrawlSpec() {
 		CrawlSpecification crawler =
-		        new CrawlSpecification("http://caos.uab.es/~gruiz/test/wivet/");
+		        new CrawlSpecification("http://spci.st.ewi.tudelft.nl/demo/wivet/");
 		crawler.setMaximumStates(0);
 		crawler.setDepth(0);
 		crawler.setRandomInputInForms(true);
@@ -46,42 +48,25 @@ public class WivetTest {
 	/**
 	 * @return the crawljax thread configuration
 	 */
-	private static ThreadConfiguration getThreadConfiguration() {
+	private ThreadConfiguration getThreadConfiguration() {
 		ThreadConfiguration tc = new ThreadConfiguration();
 		tc.setBrowserBooting(true);
-		tc.setNumberBrowsers(1);
-		tc.setNumberThreads(1);
+		tc.setNumberBrowsers(5);
+		tc.setNumberThreads(10);
 		return tc;
 	}
 
 	/**
 	 * @return the crawljax configuration
 	 */
-	private static CrawljaxConfiguration getConfig() {
+	private CrawljaxConfiguration getConfig() {
 		CrawljaxConfiguration crawljaxConfiguration = new CrawljaxConfiguration();
 		crawljaxConfiguration.setThreadConfiguration(getThreadConfiguration());
 		crawljaxConfiguration.setBrowser(EmbeddedBrowser.BrowserType.firefox);
 		crawljaxConfiguration.setCrawlSpecification(getCrawlSpec());
-		/* proxy stuff */
-		/*
-		 * ProxyConfiguration p = new ProxyConfiguration(); p.setHostname("localhost");
-		 * p.setPort(8080); crawljaxConfiguration.setProxyConfiguration(p);
-		 */
+		// ProxyConfiguration p = new ProxyConfiguration(); p.setHostname("localhost");
+		// p.setPort(8080); crawljaxConfiguration.setProxyConfiguration(p);
 		return crawljaxConfiguration;
 	}
 
-	/**
-	 * @param args
-	 *            none.
-	 */
-	public static void main(String[] args) {
-		try {
-			CrawljaxController crawljax = new CrawljaxController(getConfig());
-			crawljax.run();
-		} catch (CrawljaxException e) {
-			e.printStackTrace();
-		} catch (ConfigurationException e) {
-			e.printStackTrace();
-		}
-	}
 }
