@@ -86,6 +86,9 @@ public class CrawlOverview implements OnNewStatePlugin, PreStateCrawlingPlugin,
 		visitedStates.putIfAbsent(state.getName(), vertex);
 		saveScreenshot(context.getBrowser(), state.getName(), vertex);
 		outputBuilder.persistDom(state.getName(), context.getBrowser().getUnStrippedDom());
+		
+		// Persist page structure for X-PERT Tool
+		outputBuilder.persistPageStructure(state.getName(), context.getBrowser());
 	}
 
 	private void saveScreenshot(EmbeddedBrowser browser, String name,

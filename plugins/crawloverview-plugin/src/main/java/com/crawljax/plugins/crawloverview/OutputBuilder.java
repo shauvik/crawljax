@@ -2,13 +2,12 @@ package com.crawljax.plugins.crawloverview;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import javax.annotation.Nullable;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -16,6 +15,19 @@ import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.annotation.Nullable;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.crawljax.browser.EmbeddedBrowser;
 import com.crawljax.core.CrawljaxException;
 import com.crawljax.core.configuration.CrawljaxConfiguration;
 import com.crawljax.plugins.crawloverview.model.OutPutModel;
@@ -24,14 +36,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
-import org.apache.commons.io.FileUtils;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class OutputBuilder {
 
@@ -230,6 +234,33 @@ class OutputBuilder {
 		} catch (IOException e) {
 			return "Could not load DOM: " + e.getLocalizedMessage();
 		}
+	}
+
+	public void persistPageStructure(String name, EmbeddedBrowser browser) {
+		try {
+			String webdiff_script = getPkgFileContents(OutputBuilder.class, "webdiff2.js");
+			String pageStructure = (String) browser.executeJavaScript(webdiff_script);
+			Files.write(Strings.nullToEmpty(pageStructure), new File(doms, name + ".json"), Charsets.UTF_8);
+		} catch (IOException e) {
+			LOG.warn("Could not save page structure for {}", name);
+			LOG.debug("Could not save page structure", e);
+		}
+	}
+	
+	/**
+	 * Read a file that is in the package structure
+	 * 
+	 * @param pkgFileName
+	 * @return file contents
+	 */
+	public static String getPkgFileContents(Class cls, String pkgFileName) {
+		StringWriter writer = new StringWriter();
+		try {
+			IOUtils.copy(cls.getResourceAsStream(pkgFileName), writer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return writer.toString();
 	}
 
 }
